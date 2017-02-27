@@ -1,0 +1,67 @@
+package main
+
+import (
+	"log"
+	"net/http"
+	"time"
+
+	mgo "gopkg.in/mgo.v2"
+
+	"github.com/gorilla/mux"
+	"github.com/qawarrior/playlister/controllers"
+)
+
+var (
+	router = mux.NewRouter().StrictSlash(true)
+	db     *mgo.Session
+	uri    = "mongodb://localhost"
+)
+
+func init() {
+	// Connect to our local mongo
+	s, err := mgo.Dial(uri)
+
+	// Check if connection error, is mongo running?
+	if err != nil {
+		panic(err)
+	}
+
+	db = s
+}
+
+func main() {
+	//handle /user path
+	userRoutes()
+	artistRoutes()
+
+	//starts and runs the http server
+	startServer()
+}
+
+func userRoutes() {
+	// Get controll instance
+	uc := controllers.NewUserController(db)
+
+	// Setup routes using the controller functions
+	router.HandleFunc("/user/all", uc.GetUsers).Methods("GET")
+	router.HandleFunc("/user/{email}/{password}", uc.GetUser).Methods("GET")
+	router.HandleFunc("/user/{email}/{password}", uc.DeleteUser).Methods("DELETE")
+	router.HandleFunc("/user/new", uc.PostUser).Methods("POST")
+}
+
+func artistRoutes() {
+	ac := controllers.NewArtistController(db)
+	router.HandleFunc("/artist", ac.GetArtist).Methods("GET")
+	router.HandleFunc("/artist", ac.DeleteArtist).Methods("DELETE")
+	router.HandleFunc("/artist", ac.PostArtist).Methods("POST")
+}
+
+func startServer() {
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         "127.0.0.1:8001",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	log.Fatal(srv.ListenAndServe())
+}
