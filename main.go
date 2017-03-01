@@ -40,7 +40,7 @@ func main() {
 
 func userRoutes() {
 	// Get controll instance
-	uc := controllers.NewUserController(db)
+	uc := controllers.NewUserController(db.Copy())
 
 	// Setup routes using the controller functions
 	router.HandleFunc("/user/all", uc.GetUsers).Methods("GET")
@@ -50,7 +50,7 @@ func userRoutes() {
 }
 
 func artistRoutes() {
-	ac := controllers.NewArtistController(db)
+	ac := controllers.NewArtistController(db.Copy())
 	router.HandleFunc("/artist", ac.GetArtist).Methods("GET")
 	router.HandleFunc("/artist", ac.DeleteArtist).Methods("DELETE")
 	router.HandleFunc("/artist", ac.PostArtist).Methods("POST")

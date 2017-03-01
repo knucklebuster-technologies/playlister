@@ -57,4 +57,4 @@ _testmain.go
 # MongoDB Files To Ignore
 # =========================
 
-databases/
+db/
