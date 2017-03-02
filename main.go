@@ -43,17 +43,17 @@ func userRoutes() {
 	uc := controllers.NewUserController(db.Copy())
 
 	// Setup routes using the controller functions
-	router.HandleFunc("/user/all", uc.GetUsers).Methods("GET")
-	router.HandleFunc("/user/{email}/{password}", uc.GetUser).Methods("GET")
-	router.HandleFunc("/user/{email}/{password}", uc.DeleteUser).Methods("DELETE")
-	router.HandleFunc("/user/new", uc.PostUser).Methods("POST")
+	router.HandleFunc("/user/v1/all", uc.GetUsers).Methods("GET")
+	router.HandleFunc("/user/v1/{email}/{password}", uc.GetUser).Methods("GET")
+	router.HandleFunc("/user/v1/{email}/{password}", uc.DeleteUser).Methods("DELETE")
+	router.HandleFunc("/user/v1/new", uc.PostUser).Methods("POST")
 }
 
 func artistRoutes() {
 	ac := controllers.NewArtistController(db.Copy())
-	router.HandleFunc("/artist", ac.GetArtist).Methods("GET")
-	router.HandleFunc("/artist", ac.DeleteArtist).Methods("DELETE")
-	router.HandleFunc("/artist", ac.PostArtist).Methods("POST")
+	router.HandleFunc("/v1/artist", ac.GetArtist).Methods("GET")
+	router.HandleFunc("/v1/artist", ac.DeleteArtist).Methods("DELETE")
+	router.HandleFunc("/v1/artist", ac.PostArtist).Methods("POST")
 }
 
 func startServer() {

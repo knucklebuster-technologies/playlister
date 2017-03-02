@@ -14,4 +14,5 @@ type Artist struct {
 	Born       time.Time     `json:"born" bson:"born"`
 	Death      time.Time     `json:"death" bson:"death"`
 	Birthplace string        `json:"birthplace" bson:"birthplace"`
+	Bio        string        `json:"bio" bson:"bio"`
 }
