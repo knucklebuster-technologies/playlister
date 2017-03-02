@@ -8,10 +8,10 @@ import (
 
 // Artist represents a music artists info
 type Artist struct {
-	ID        bson.ObjectId `json:"id"  bson:"_id"`
-	Name      string        `json:"name" bson:"name"`
-	Founded   time.Time     `json:"founded" bson:"founded"`
-	Disbanded time.Time     `json:"disbanded" bson:"disbanded"`
-	Members   []string      `json:"members" bson:"members"`
-	Releases  []string      `json:"releases" bson:"releases"`
+	ID         bson.ObjectId `json:"id"  bson:"_id"`
+	First      string        `json:"first" bson:"first"`
+	Last       string        `json:"last" bson:"last"`
+	Born       time.Time     `json:"born" bson:"born"`
+	Death      time.Time     `json:"death" bson:"death"`
+	Birthplace string        `json:"birthplace" bson:"birthplace"`
 }
