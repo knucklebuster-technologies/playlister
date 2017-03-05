@@ -25,8 +25,8 @@ func NewArtistController(s *mgo.Session) *ArtistController {
 func (c ArtistController) GetArtist(w http.ResponseWriter, r *http.Request) {
 	m := decodeArtist(r.Body, models.Artist{})
 
-	if m.Name == "" {
-		sendResponse("ERROR", "name property required to get artist", m, 404, w)
+	if m.First == "" || m.Last == "" {
+		sendResponse("ERROR", "first and last property required to get artist", m, 404, w)
 		return
 	}
 
@@ -63,12 +63,12 @@ func (c ArtistController) DeleteArtist(w http.ResponseWriter, r *http.Request) {
 	m := decodeArtist(r.Body, models.Artist{})
 
 	// check that we have a name to use for deletion
-	if m.Name == "" {
-		sendResponse("ERROR", "name property needed to delete artist", m, 404, w)
+	if m.First == "" || m.Last == "" {
+		sendResponse("ERROR", "first and last property needed to delete artist", m, 404, w)
 		return
 	}
 
-	err := c.collection.Remove(bson.M{"name": m.Name})
+	err := c.collection.Remove(bson.M{"first": m.First, "last": m.Last})
 
 	if err != nil {
 		sendResponse("ERROR", "delete failed", err, 404, w)
