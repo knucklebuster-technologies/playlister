@@ -19,6 +19,7 @@ var (
 	configuration = models.AppConfig{}
 	router        = mux.NewRouter().StrictSlash(true)
 	db            *mgo.Session
+	once          sync.Once
 )
 
 func main() {
@@ -59,7 +60,6 @@ func loadConfig() {
 }
 
 func connectDatabase() {
-	var once sync.Once
 	once.Do(func() {
 		log.Println("Connecting to database @", configuration.Data.URI)
 		s, err := mgo.Dial(configuration.Data.URI)
