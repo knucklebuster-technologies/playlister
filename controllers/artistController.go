@@ -29,8 +29,8 @@ func (c ArtistController) GetArtist(w http.ResponseWriter, r *http.Request) {
 	m := decodeArtist(r.Body, models.Artist{})
 
 	if m.First == "" || m.Last == "" {
-		log.Println("Can not perform read with json values")
-		sendResponse("ERROR", "first and last property required to get artist", m, 404, w)
+		log.Println("Can not perform read without first and last json values")
+		sendResponse("ERROR", "Can not perform read without first and last json values", m, 404, w)
 		return
 	}
 
@@ -51,11 +51,12 @@ func (c ArtistController) GetArtist(w http.ResponseWriter, r *http.Request) {
 
 // PostArtist creates a new Artist document in the database
 func (c ArtistController) PostArtist(w http.ResponseWriter, r *http.Request) {
+	log.Println("PostArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
 	if m.First == "" || m.Last == "" {
-		log.Println("Can not perform query with json values")
-		sendResponse("ERROR", "first and last property required to get artist", m, 404, w)
+		log.Println("Can not perform insert without first and last json values")
+		sendResponse("ERROR", "Can not perform insert without first and last json values", m, 404, w)
 		return
 	}
 
@@ -63,29 +64,35 @@ func (c ArtistController) PostArtist(w http.ResponseWriter, r *http.Request) {
 
 	err := c.collection.Insert(&m)
 	if err != nil {
+		log.Println("Failed to insert artist into database")
 		sendResponse("ERROR", "failed to create artist", m, 404, w)
 		return
 	}
 
 	sendResponse("SUCCESS", "artist was created", m, 201, w)
+	log.Println("Artist was created")
 }
 
 // DeleteArtist removes an Artist document in the database
 func (c ArtistController) DeleteArtist(w http.ResponseWriter, r *http.Request) {
+	log.Println("DeleteArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
 	// check that we have a name to use for deletion
 	if m.First == "" || m.Last == "" {
-		sendResponse("ERROR", "first and last property needed to delete artist", m, 404, w)
+		log.Println("Can not perform remove without first and last json values")
+		sendResponse("ERROR", "Can not perform remove without first and last json values", m, 404, w)
 		return
 	}
 
 	err := c.collection.Remove(bson.M{"first": m.First, "last": m.Last})
 
 	if err != nil {
-		sendResponse("ERROR", "delete failed", err, 404, w)
+		log.Println("Failed to remove from database -", err)
+		sendResponse("ERROR", "Failed to remove from database", err, 404, w)
 		return
 	}
 
+	log.Println("artist was deleted")
 	sendResponse("SUCCESS", "artist was deleted", m, 200, w)
 }
