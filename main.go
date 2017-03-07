@@ -2,17 +2,16 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
 
 	"github.com/gorilla/mux"
+	"github.com/qawarrior/playlister/controllers"
 	"github.com/qawarrior/playlister/models"
 )
 
@@ -23,53 +22,70 @@ var (
 )
 
 func main() {
-	log.Println("Calling loadConfig")
+	log.Println("Starting Main Loop")
+
 	loadConfig()
 
-	log.Println("Calling connectDatabase")
 	connectDatabase()
 
-	log.Println("Calling userRoutes")
 	userRoutes()
 
-	log.Println("Calling artistRoutes")
 	artistRoutes()
 
-	//starts and runs the http server
-	log.Println("Calling startServer")
 	startServer()
+
+	log.Println("Ending Main Loop")
 }
 
 func startServer() {
+	log.Println("Defining HTTP Server")
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         configuration.Server.Address,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
+	log.Println("Starting HTTP Server @", configuration.Server.Address)
 	log.Fatal(srv.ListenAndServe())
 }
 
 func loadConfig() {
+	log.Println("Reading config.json")
 	file, err := ioutil.ReadFile("./config.json")
 	if err != nil {
-		fmt.Printf("File error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	json.Unmarshal(file, &configuration)
+	log.Println("Application config loaded")
 }
 
 func connectDatabase() {
 	var once sync.Once
 	once.Do(func() {
-		// Connect to our local mongo
+		log.Println("Connecting to database @", configuration.Data.URI)
 		s, err := mgo.Dial(configuration.Data.URI)
 
-		// Check if connection error, is mongo running?
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		db = s
+		log.Println("Database connected")
 	})
+}
+
+func userRoutes() {
+	log.Println("Setting up user routes and handlers")
+	uc := controllers.NewUserController(db.Copy().DB(configuration.Data.DBName))
+	router.HandleFunc("/v1/user", uc.GetUser).Methods("GET")
+	router.HandleFunc("/v1/user", uc.DeleteUser).Methods("DELETE")
+	router.HandleFunc("/v1/user", uc.PostUser).Methods("POST")
+}
+
+func artistRoutes() {
+	log.Println("Setting up artidt routes and handlers")
+	ac := controllers.NewArtistController(db.Copy().DB(configuration.Data.DBName))
+	router.HandleFunc("/v1/artist", ac.GetArtist).Methods("GET")
+	router.HandleFunc("/v1/artist", ac.DeleteArtist).Methods("DELETE")
+	router.HandleFunc("/v1/artist", ac.PostArtist).Methods("POST")
 }
