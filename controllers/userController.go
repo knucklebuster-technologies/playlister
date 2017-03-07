@@ -11,16 +11,14 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var dbName = "playlister"
-
 // UserController represents the controller for operating on the User resource
 type UserController struct {
 	collection *mgo.Collection
 }
 
 // NewUserController returns a controller for a User
-func NewUserController(s *mgo.Session) *UserController {
-	c := s.DB(dbName).C("users")
+func NewUserController(d *mgo.Database) *UserController {
+	c := d.C("users")
 	return &UserController{c}
 }
 

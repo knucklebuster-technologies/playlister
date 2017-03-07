@@ -16,8 +16,8 @@ type ArtistController struct {
 }
 
 // NewArtistController returns a controller for a User
-func NewArtistController(s *mgo.Session) *ArtistController {
-	c := s.DB(dbName).C("artists")
+func NewArtistController(d *mgo.Database) *ArtistController {
+	c := d.C("artists")
 	return &ArtistController{c}
 }
 

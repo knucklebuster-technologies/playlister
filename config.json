@@ -1,0 +1,10 @@
+{
+    "version": "0.0.1",
+    "server": {
+        "address": "127.0.0.1:8001"
+    },
+    "data": {
+        "uri": "mongodb://localhost",
+        "dbName": "playlister"
+    }
+}

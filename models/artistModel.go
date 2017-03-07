@@ -12,7 +12,7 @@ type Artist struct {
 	First      string        `json:"first" bson:"first"`
 	Last       string        `json:"last" bson:"last"`
 	Born       time.Time     `json:"born" bson:"born"`
-	Death      time.Time     `json:"death" bson:"death"`
+	Died       time.Time     `json:"died" bson:"died"`
 	Birthplace string        `json:"birthplace" bson:"birthplace"`
 	Bio        string        `json:"bio" bson:"bio"`
 }

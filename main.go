@@ -1,67 +1,75 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"sync"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
 
 	"github.com/gorilla/mux"
-	"github.com/qawarrior/playlister/controllers"
+	"github.com/qawarrior/playlister/models"
 )
 
 var (
-	router = mux.NewRouter().StrictSlash(true)
-	db     *mgo.Session
-	uri    = "mongodb://localhost"
+	configuration = models.AppConfig{}
+	router        = mux.NewRouter().StrictSlash(true)
+	db            *mgo.Session
 )
 
-func init() {
-	// Connect to our local mongo
-	s, err := mgo.Dial(uri)
-
-	// Check if connection error, is mongo running?
-	if err != nil {
-		panic(err)
-	}
-
-	db = s
-}
-
 func main() {
-	//handle /user path
+	log.Println("Calling loadConfig")
+	loadConfig()
+
+	log.Println("Calling connectDatabase")
+	connectDatabase()
+
+	log.Println("Calling userRoutes")
 	userRoutes()
+
+	log.Println("Calling artistRoutes")
 	artistRoutes()
 
 	//starts and runs the http server
+	log.Println("Calling startServer")
 	startServer()
-}
-
-func userRoutes() {
-	// Get controll instance
-	uc := controllers.NewUserController(db.Copy())
-
-	// Setup routes using the controller functions
-	router.HandleFunc("/user/v1/all", uc.GetUsers).Methods("GET")
-	router.HandleFunc("/user/v1/{email}/{password}", uc.GetUser).Methods("GET")
-	router.HandleFunc("/user/v1/{email}/{password}", uc.DeleteUser).Methods("DELETE")
-	router.HandleFunc("/user/v1/new", uc.PostUser).Methods("POST")
-}
-
-func artistRoutes() {
-	ac := controllers.NewArtistController(db.Copy())
-	router.HandleFunc("/v1/artist", ac.GetArtist).Methods("GET")
-	router.HandleFunc("/v1/artist", ac.DeleteArtist).Methods("DELETE")
-	router.HandleFunc("/v1/artist", ac.PostArtist).Methods("POST")
 }
 
 func startServer() {
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         "127.0.0.1:8001",
+		Addr:         configuration.Server.Address,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 	log.Fatal(srv.ListenAndServe())
+}
+
+func loadConfig() {
+	file, err := ioutil.ReadFile("./config.json")
+	if err != nil {
+		fmt.Printf("File error: %v\n", err)
+		os.Exit(1)
+	}
+	json.Unmarshal(file, &configuration)
+}
+
+func connectDatabase() {
+	var once sync.Once
+	once.Do(func() {
+		// Connect to our local mongo
+		s, err := mgo.Dial(configuration.Data.URI)
+
+		// Check if connection error, is mongo running?
+		if err != nil {
+			panic(err)
+		}
+
+		db = s
+	})
 }
