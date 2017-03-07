@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/qawarrior/playlister/models"
@@ -17,21 +18,25 @@ type ArtistController struct {
 
 // NewArtistController returns a controller for a User
 func NewArtistController(d *mgo.Database) *ArtistController {
+	log.Println("Returning an ArtistController")
 	c := d.C("artists")
 	return &ArtistController{c}
 }
 
 // GetArtist returns a specific Artist in the collection
 func (c ArtistController) GetArtist(w http.ResponseWriter, r *http.Request) {
+	log.Println("GetArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
 	if m.First == "" || m.Last == "" {
+		log.Println("Can not perform read with json values")
 		sendResponse("ERROR", "first and last property required to get artist", m, 404, w)
 		return
 	}
 
 	err := c.collection.Find(nil).One(&m)
 	if err != nil {
+		log.Println("Failed to find artist in database")
 		sendResponse("ERROR", "failed to get artist", err, 404, w)
 		return
 	}
@@ -41,11 +46,18 @@ func (c ArtistController) GetArtist(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, "%s", mj)
+	log.Println("Artist was returned")
 }
 
 // PostArtist creates a new Artist document in the database
 func (c ArtistController) PostArtist(w http.ResponseWriter, r *http.Request) {
 	m := decodeArtist(r.Body, models.Artist{})
+
+	if m.First == "" || m.Last == "" {
+		log.Println("Can not perform query with json values")
+		sendResponse("ERROR", "first and last property required to get artist", m, 404, w)
+		return
+	}
 
 	m.ID = bson.NewObjectId()
 

@@ -23,6 +23,7 @@ var (
 
 func main() {
 	log.Println("Starting Main Loop")
+	defer db.Close()
 
 	loadConfig()
 
@@ -33,8 +34,6 @@ func main() {
 	artistRoutes()
 
 	startServer()
-
-	log.Println("Ending Main Loop")
 }
 
 func startServer() {
