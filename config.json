@@ -6,5 +6,10 @@
     "data": {
         "uri": "mongodb://localhost",
         "dbName": "playlister"
+    },
+    "discogs": {
+        "uri": "https://api.discogs.com",
+        "key": "NceSrVbCNEhKBezoLlbE",
+        "secret": "GAxCVFfFkCihvLjiwWWPFxaHVckwrfdj"
     }
 }

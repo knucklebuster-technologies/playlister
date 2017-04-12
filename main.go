@@ -34,18 +34,18 @@ func main() {
 
 	artistRoutes()
 
-	startServer()
+	startServer(configuration.Server)
 }
 
-func startServer() {
+func startServer(c models.ServerConfig) {
 	log.Println("Defining HTTP Server")
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         configuration.Server.Address,
+		Addr:         c.Address,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	log.Println("Starting HTTP Server @", configuration.Server.Address)
+	log.Println("Starting HTTP Server @", c.Address)
 	log.Fatal(srv.ListenAndServe())
 }
 
