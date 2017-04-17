@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
 	mgo "gopkg.in/mgo.v2"
@@ -15,26 +14,33 @@ import (
 	"github.com/qawarrior/playlister/models"
 )
 
-var (
-	configuration = models.AppConfig{}
-	router        = mux.NewRouter().StrictSlash(true)
-	db            *mgo.Session
-	once          sync.Once
-)
+var router = mux.NewRouter().StrictSlash(true)
 
 func main() {
 	log.Println("Starting Main Loop")
+
+	config := loadConfig()
+
+	db := connectDatabase(config.Data)
 	defer db.Close()
 
-	loadConfig()
+	userRoutes(config.Data, db)
 
-	connectDatabase()
+	artistRoutes(config.Data, db)
 
-	userRoutes()
+	startServer(config.Server)
+}
 
-	artistRoutes()
-
-	startServer(configuration.Server)
+func loadConfig() models.AppConfig {
+	log.Println("Reading config.json")
+	file, err := ioutil.ReadFile("./config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	configuration := models.AppConfig{}
+	json.Unmarshal(file, &configuration)
+	log.Println("Application config loaded")
+	return configuration
 }
 
 func startServer(c models.ServerConfig) {
@@ -49,41 +55,29 @@ func startServer(c models.ServerConfig) {
 	log.Fatal(srv.ListenAndServe())
 }
 
-func loadConfig() {
-	log.Println("Reading config.json")
-	file, err := ioutil.ReadFile("./config.json")
+func connectDatabase(c models.DataConfig) *mgo.Session {
+	log.Println("Connecting to database @", c.URI)
+	s, err := mgo.Dial(c.URI)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	json.Unmarshal(file, &configuration)
-	log.Println("Application config loaded")
+
+	log.Println("Database connected")
+	return s
 }
 
-func connectDatabase() {
-	once.Do(func() {
-		log.Println("Connecting to database @", configuration.Data.URI)
-		s, err := mgo.Dial(configuration.Data.URI)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		db = s
-		log.Println("Database connected")
-	})
-}
-
-func userRoutes() {
+func userRoutes(c models.DataConfig, db *mgo.Session) {
 	log.Println("Setting up user routes and handlers")
-	uc := controllers.NewUserController(db.Copy().DB(configuration.Data.DBName))
+	uc := controllers.NewUserController(db.Copy().DB(c.DBName))
 	router.HandleFunc("/v1/user", uc.GetUser).Methods("GET")
 	router.HandleFunc("/v1/user", uc.DeleteUser).Methods("DELETE")
 	router.HandleFunc("/v1/user", uc.PostUser).Methods("POST")
 }
 
-func artistRoutes() {
+func artistRoutes(c models.DataConfig, db *mgo.Session) {
 	log.Println("Setting up artidt routes and handlers")
-	ac := controllers.NewArtistController(db.Copy().DB(configuration.Data.DBName))
+	ac := controllers.NewArtistController(db.Copy().DB(c.DBName))
 	router.HandleFunc("/v1/artist", ac.GetArtist).Methods("GET")
 	router.HandleFunc("/v1/artist", ac.DeleteArtist).Methods("DELETE")
 	router.HandleFunc("/v1/artist", ac.PostArtist).Methods("POST")
