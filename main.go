@@ -14,8 +14,6 @@ import (
 	"github.com/qawarrior/playlister/models"
 )
 
-var router = mux.NewRouter().StrictSlash(true)
-
 func main() {
 	log.Println("Starting Main Loop")
 
@@ -24,11 +22,13 @@ func main() {
 	db := connectDatabase(config.Data)
 	defer db.Close()
 
-	userRoutes(config.Data, db)
+	router := mux.NewRouter().StrictSlash(true)
 
-	artistRoutes(config.Data, db)
+	userRoutes(config.Data, db, router)
 
-	startServer(config.Server)
+	artistRoutes(config.Data, db, router)
+
+	startServer(config.Server, router)
 }
 
 func loadConfig() models.AppConfig {
@@ -43,7 +43,7 @@ func loadConfig() models.AppConfig {
 	return configuration
 }
 
-func startServer(c models.ServerConfig) {
+func startServer(c models.ServerConfig, router *mux.Router) {
 	log.Println("Defining HTTP Server")
 	srv := &http.Server{
 		Handler:      router,
@@ -67,7 +67,7 @@ func connectDatabase(c models.DataConfig) *mgo.Session {
 	return s
 }
 
-func userRoutes(c models.DataConfig, db *mgo.Session) {
+func userRoutes(c models.DataConfig, db *mgo.Session, router *mux.Router) {
 	log.Println("Setting up user routes and handlers")
 	uc := controllers.NewUserController(db.Copy().DB(c.DBName))
 	router.HandleFunc("/v1/user", uc.GetUser).Methods("GET")
@@ -75,7 +75,7 @@ func userRoutes(c models.DataConfig, db *mgo.Session) {
 	router.HandleFunc("/v1/user", uc.PostUser).Methods("POST")
 }
 
-func artistRoutes(c models.DataConfig, db *mgo.Session) {
+func artistRoutes(c models.DataConfig, db *mgo.Session, router *mux.Router) {
 	log.Println("Setting up artidt routes and handlers")
 	ac := controllers.NewArtistController(db.Copy().DB(c.DBName))
 	router.HandleFunc("/v1/artist", ac.GetArtist).Methods("GET")
