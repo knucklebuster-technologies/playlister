@@ -1,5 +1,7 @@
 {
-    "version": "0.0.1",
+    "appName": "playlister",
+    "appURI": "https://github.com/qawarrior/playlister",
+    "version": "v0.0.1-alpha",
     "server": {
         "address": "127.0.0.1:8001"
     },
@@ -11,5 +13,8 @@
         "uri": "https://api.discogs.com",
         "key": "NceSrVbCNEhKBezoLlbE",
         "secret": "GAxCVFfFkCihvLjiwWWPFxaHVckwrfdj"
+    },
+    "musicbrainz": {
+        "uri": "https://musicbrainz.org/ws/2"
     }
 }

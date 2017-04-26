@@ -18,10 +18,18 @@ type DiscogsConfig struct {
 	Secret string `json:"secret"`
 }
 
+// MusicBrainzConfig values for the musicbrainz web service
+type MusicBrainzConfig struct {
+	URI string `json:"uri"`
+}
+
 // AppConfig structure to contain configuration values
 type AppConfig struct {
-	Version string
-	Server  ServerConfig  `json:"server"`
-	Data    DataConfig    `json:"data"`
-	Discogs DiscogsConfig `json:"discogs"`
+	Version     string            `json:"version"`
+	AppName     string            `json:"appName"`
+	AppURI      string            `json:"appURI"`
+	Server      ServerConfig      `json:"server"`
+	Data        DataConfig        `json:"data"`
+	Discogs     DiscogsConfig     `json:"discogs"`
+	MusicBrainz MusicBrainzConfig `json:"musicbrainz"`
 }
