@@ -5,22 +5,34 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
-
-	mgo "gopkg.in/mgo.v2"
 
 	"github.com/gorilla/mux"
 	"github.com/qawarrior/playlister/models"
 )
 
 func main() {
-	log.Println("Starting Main Loop")
+	log.Println("STARTING MAIN")
+	wdir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("WORKING DIRECTORY:", wdir)
 
-	config := loadConfig()
+	config := readConfig(wdir + `\config.json`)
+
+	dbsrv := newDBServer(wdir + `\db`)
+	err = dbsrv.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer dbsrv.Stop()
 
 	db := connectDatabase(config.Data)
 	defer db.Close()
 
+	log.Println("SETTING UP HTTP ROUTER")
 	router := mux.NewRouter().StrictSlash(true)
 
 	userRoutes(config.Data, db, router)
@@ -30,38 +42,26 @@ func main() {
 	startHTTPServer(config.Server, router)
 }
 
-func loadConfig() models.AppConfig {
-	log.Println("Reading config.json")
-	file, err := ioutil.ReadFile("./config.json")
+func readConfig(path string) models.AppConfig {
+	log.Println("READING CONFIGURATION FROM:", path)
+	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}
 	configuration := models.AppConfig{}
 	json.Unmarshal(file, &configuration)
-	log.Println("Application config loaded")
+	log.Println("CONFIGURATION READ SUCCESSFULLY")
 	return configuration
 }
 
 func startHTTPServer(c models.ServerConfig, router *mux.Router) {
-	log.Println("Defining HTTP Server")
+	log.Println("SETTING UP HTTP SERVER")
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         c.Address,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	log.Println("Starting HTTP Server @", c.Address)
+	log.Println("STARTING HTTP SERVER AT:", c.Address)
 	log.Fatal(srv.ListenAndServe())
-}
-
-func connectDatabase(c models.DataConfig) *mgo.Session {
-	log.Println("Connecting to database @", c.URI)
-	s, err := mgo.Dial(c.URI)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Database connected")
-	return s
 }

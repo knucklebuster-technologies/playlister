@@ -11,20 +11,44 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// ArtistController represents the controller for operating on the Artist resource
+// ArtistController manages the Artist endpoint
 type ArtistController struct {
 	collection *mgo.Collection
 }
 
-// NewArtistController returns a controller for a User
+// NewArtistController returns a controller that manages the Artists endpoint
 func NewArtistController(d *mgo.Database) *ArtistController {
 	log.Println("Returning an ArtistController")
 	c := d.C("artists")
 	return &ArtistController{c}
 }
 
-// GetArtist returns a specific Artist in the collection
-func (c ArtistController) GetArtist(w http.ResponseWriter, r *http.Request) {
+// Create adds a specific Artist in the collection
+func (c ArtistController) Create(w http.ResponseWriter, r *http.Request) {
+	log.Println("PostArtist called")
+	m := decodeArtist(r.Body, models.Artist{})
+
+	if m.First == "" || m.Last == "" {
+		log.Println("Can not perform insert without first and last json values")
+		sendResponse("ERROR", "Can not perform insert without first and last json values", m, 404, w)
+		return
+	}
+
+	m.ID = bson.NewObjectId()
+
+	err := c.collection.Insert(&m)
+	if err != nil {
+		log.Println("Failed to insert artist into database")
+		sendResponse("ERROR", "failed to create artist", m, 404, w)
+		return
+	}
+
+	sendResponse("SUCCESS", "artist was created", m, 201, w)
+	log.Println("Artist was created")
+}
+
+// Read returns a specific Artist in the collection
+func (c ArtistController) Read(w http.ResponseWriter, r *http.Request) {
 	log.Println("GetArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
@@ -49,32 +73,13 @@ func (c ArtistController) GetArtist(w http.ResponseWriter, r *http.Request) {
 	log.Println("Artist was returned")
 }
 
-// PostArtist creates a new Artist document in the database
-func (c ArtistController) PostArtist(w http.ResponseWriter, r *http.Request) {
-	log.Println("PostArtist called")
-	m := decodeArtist(r.Body, models.Artist{})
-
-	if m.First == "" || m.Last == "" {
-		log.Println("Can not perform insert without first and last json values")
-		sendResponse("ERROR", "Can not perform insert without first and last json values", m, 404, w)
-		return
-	}
-
-	m.ID = bson.NewObjectId()
-
-	err := c.collection.Insert(&m)
-	if err != nil {
-		log.Println("Failed to insert artist into database")
-		sendResponse("ERROR", "failed to create artist", m, 404, w)
-		return
-	}
-
-	sendResponse("SUCCESS", "artist was created", m, 201, w)
-	log.Println("Artist was created")
+// Update modifies a specific Artist in the collection
+func (c ArtistController) Update(w http.ResponseWriter, r *http.Request) {
+	sendResponse("UPDATED", "Artist was updated", models.Artist{}, 200, w)
 }
 
-// DeleteArtist removes an Artist document in the database
-func (c ArtistController) DeleteArtist(w http.ResponseWriter, r *http.Request) {
+// Delete removes a specific Artist in the collection
+func (c ArtistController) Delete(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 

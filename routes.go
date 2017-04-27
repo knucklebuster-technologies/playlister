@@ -10,17 +10,17 @@ import (
 )
 
 func userRoutes(c models.DataConfig, db *mgo.Session, router *mux.Router) {
-	log.Println("Setting up user routes and handlers")
+	log.Println("SETTING UP USER ROUTES AND HANDLERS")
 	uc := controllers.NewUserController(db.Copy().DB(c.DBName))
-	router.HandleFunc("/v1/user", uc.GetUser).Methods("GET")
-	router.HandleFunc("/v1/user", uc.DeleteUser).Methods("DELETE")
-	router.HandleFunc("/v1/user", uc.PostUser).Methods("POST")
+	router.HandleFunc("/v1/user", uc.Get).Methods("GET")
+	router.HandleFunc("/v1/user", uc.Delete).Methods("DELETE")
+	router.HandleFunc("/v1/user", uc.Create).Methods("POST")
 }
 
 func artistRoutes(c models.DataConfig, db *mgo.Session, router *mux.Router) {
-	log.Println("Setting up artists routes and handlers")
+	log.Println("SETTING UP ARTIST ROUTES AND HANDLERS")
 	ac := controllers.NewArtistController(db.Copy().DB(c.DBName))
-	router.HandleFunc("/v1/artist", ac.GetArtist).Methods("GET")
-	router.HandleFunc("/v1/artist", ac.DeleteArtist).Methods("DELETE")
-	router.HandleFunc("/v1/artist", ac.PostArtist).Methods("POST")
+	router.HandleFunc("/v1/artist", ac.Read).Methods("GET")
+	router.HandleFunc("/v1/artist", ac.Delete).Methods("DELETE")
+	router.HandleFunc("/v1/artist", ac.Create).Methods("POST")
 }
