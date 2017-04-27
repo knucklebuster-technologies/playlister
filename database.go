@@ -13,7 +13,7 @@ func (srv *dbserver) Start() error {
 	if err != nil {
 		return err
 	}
-	return nil
+	return nil 
 }
 
 func (srv *dbserver) Stop() {
