@@ -27,7 +27,7 @@ func main() {
 
 	artistRoutes(config.Data, db, router)
 
-	startServer(config.Server, router)
+	startHTTPServer(config.Server, router)
 }
 
 func loadConfig() models.AppConfig {
@@ -42,7 +42,7 @@ func loadConfig() models.AppConfig {
 	return configuration
 }
 
-func startServer(c models.ServerConfig, router *mux.Router) {
+func startHTTPServer(c models.ServerConfig, router *mux.Router) {
 	log.Println("Defining HTTP Server")
 	srv := &http.Server{
 		Handler:      router,
