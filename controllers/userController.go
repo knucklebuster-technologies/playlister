@@ -22,29 +22,31 @@ func NewUserController(d *mgo.Database) *UserController {
 	return &UserController{c}
 }
 
-// GetUsers returns all users in the collection
-func (c UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
-	// Stub a slice of user
-	m := []models.User{}
+// Create creates a new user
+func (c UserController) Create(w http.ResponseWriter, r *http.Request) {
+	// Stub an user to be populated from the body
+	m := models.User{}
 
-	// Fetch All Users
-	if err := c.collection.Find(nil).All(&m); err != nil {
-		w.WriteHeader(404)
-		return
-	}
+	// Populate the user data
+	json.NewDecoder(r.Body).Decode(&m)
+
+	// Add an Id
+	m.ID = bson.NewObjectId()
+
+	// Write the user to mongo
+	c.collection.Insert(&m)
 
 	// Marshal provided interface into JSON structure
 	mj, _ := json.Marshal(m)
 
 	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
+	w.WriteHeader(201)
 	fmt.Fprintf(w, "%s", mj)
-
 }
 
-// GetUser returns an existing user by email and password
-func (c UserController) GetUser(w http.ResponseWriter, r *http.Request) {
+// Read returns an existing user by email and password
+func (c UserController) Read(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	email := vars["email"]
 	password := vars["password"]
@@ -67,31 +69,13 @@ func (c UserController) GetUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", mj)
 }
 
-// PostUser creates a new user
-func (c UserController) PostUser(w http.ResponseWriter, r *http.Request) {
-	// Stub an user to be populated from the body
-	m := models.User{}
-
-	// Populate the user data
-	json.NewDecoder(r.Body).Decode(&m)
-
-	// Add an Id
-	m.ID = bson.NewObjectId()
-
-	// Write the user to mongo
-	c.collection.Insert(&m)
-
-	// Marshal provided interface into JSON structure
-	mj, _ := json.Marshal(m)
-
-	// Write content-type, statuscode, payload
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-	fmt.Fprintf(w, "%s", mj)
+// Update modifies an existing user in the database
+func (c UserController) Update(w http.ResponseWriter, r *http.Request) {
+	sendResponse("Success", "User Updated", nil, 200, w)
 }
 
-// DeleteUser removes a existing user
-func (c UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+// Delete removes a existing user
+func (c UserController) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	email := vars["email"]
 	password := vars["password"]
