@@ -18,7 +18,6 @@ type ArtistController struct {
 
 // NewArtistController returns a controller that manages the Artists endpoint
 func NewArtistController(d *mgo.Database) *ArtistController {
-	log.Println("Returning an ArtistController")
 	c := d.C("artists")
 	return &ArtistController{c}
 }
