@@ -1,6 +1,7 @@
 package database
 
 import "os/exec"
+import "gopkg.in/mgo.v2"
 
 // Server type to start, stop, and connect mongo db server
 type Server struct {
@@ -25,4 +26,21 @@ func (srv *Server) Stop() error {
 		return err
 	}
 	return nil
+}
+
+// Connect sets up a session to the database
+func (srv *Server) Connect(uri string) (*mgo.Session, error) {
+	s, err := mgo.Dial(uri)
+	if err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+// NewServer returns a value of the Server
+func NewServer(dirpath string) *Server {
+	return &Server{
+		dirpath,
+		nil,
+	}
 }
