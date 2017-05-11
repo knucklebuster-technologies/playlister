@@ -1,36 +1,47 @@
 package main
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/qawarrior/playlister/models"
+	"github.com/qawarrior/playlister/config"
+	"github.com/qawarrior/playlister/database"
 )
 
 func main() {
 	log.Println("STARTING MAIN")
+
+	log.Println("GETTING WORKING DIRECTORY")
 	wdir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("WORKING DIRECTORY:", wdir)
 
-	config := readConfig(wdir + `\config.json`)
+	log.Println("READING CONFIGURATION")
+	config := config.Config{}
+	err = config.Read(wdir + `\config.json`)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	dbsrv := newDBServer(wdir + `\db`)
+	log.Println("STARTING DATABASE SERVER")
+	dbsrv := database.NewServer(wdir + `\db`)
 	err = dbsrv.Start()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer dbsrv.Stop()
 
-	db := connectDatabase(config.Data)
-	defer db.Close()
+	log.Println("CREATING DATABASE SESSION")
+	err = dbsrv.Connect(config.Data.URI)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer dbsrv.Session.Close()
 
 	log.Println("SETTING UP HTTP ROUTER")
 	router := mux.NewRouter().StrictSlash(true)
@@ -39,29 +50,17 @@ func main() {
 
 	artistRoutes(config.Data, db, router)
 
-	startHTTPServer(config.Server, router)
+	startHTTPServer(config.Server.Address, router)
 }
 
-func readConfig(path string) models.AppConfig {
-	log.Println("READING CONFIGURATION FROM:", path)
-	file, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	configuration := models.AppConfig{}
-	json.Unmarshal(file, &configuration)
-	log.Println("CONFIGURATION READ SUCCESSFULLY")
-	return configuration
-}
-
-func startHTTPServer(c models.ServerConfig, router *mux.Router) {
+func startHTTPServer(address string, router *mux.Router) {
 	log.Println("SETTING UP HTTP SERVER")
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         c.Address,
+		Addr:         address,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	log.Println("STARTING HTTP SERVER AT:", c.Address)
+	log.Println("STARTING HTTP SERVER AT:", address)
 	log.Fatal(srv.ListenAndServe())
 }
