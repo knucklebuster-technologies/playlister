@@ -50,4 +50,5 @@ func main() {
 
 	log.Println("Starting Webserver at " + config.Server.Address)
 	webserver.Start(config.Server.Address, router)
+	defer webserver.Stop()
 }

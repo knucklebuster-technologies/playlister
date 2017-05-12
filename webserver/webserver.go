@@ -8,13 +8,20 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Start invoke the webserver on provides address, port and router
+var srv *http.Server
+
+// Start invoke the webserver on provided address, port and router
 func Start(address string, router *mux.Router) {
-	srv := &http.Server{
+	srv = &http.Server{
 		Handler:      router,
 		Addr:         address,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 	log.Fatal(srv.ListenAndServe())
+}
+
+// Stop the running webserver
+func Stop() {
+	srv.Shutdown(nil)
 }
