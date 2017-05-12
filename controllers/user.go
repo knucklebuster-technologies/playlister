@@ -11,19 +11,19 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// UserController represents the controller for operating on the User resource
-type UserController struct {
+// User represents the controller for operating on the User resource
+type User struct {
 	collection *mgo.Collection
 }
 
-// NewUserController returns a controller for a User
-func NewUserController(d *mgo.Database) *UserController {
+// NewUser returns a controller for a User
+func NewUser(d *mgo.Database) *User {
 	c := d.C("users")
-	return &UserController{c}
+	return &User{c}
 }
 
 // Create creates a new user
-func (c UserController) Create(w http.ResponseWriter, r *http.Request) {
+func (c User) Create(w http.ResponseWriter, r *http.Request) {
 	// Stub an user to be populated from the body
 	m := models.User{}
 
@@ -46,7 +46,7 @@ func (c UserController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 // Read returns an existing user by email and password
-func (c UserController) Read(w http.ResponseWriter, r *http.Request) {
+func (c User) Read(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	email := vars["email"]
 	password := vars["password"]
@@ -70,12 +70,12 @@ func (c UserController) Read(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update modifies an existing user in the database
-func (c UserController) Update(w http.ResponseWriter, r *http.Request) {
+func (c User) Update(w http.ResponseWriter, r *http.Request) {
 	sendResponse("Success", "User Updated", nil, 200, w)
 }
 
 // Delete removes a existing user
-func (c UserController) Delete(w http.ResponseWriter, r *http.Request) {
+func (c User) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	email := vars["email"]
 	password := vars["password"]

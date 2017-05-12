@@ -24,7 +24,6 @@ func NewArtist(d *mgo.Database) *Artist {
 
 // Create adds a specific Artist in the collection
 func (c Artist) Create(w http.ResponseWriter, r *http.Request) {
-	log.Println("PostArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
 	if m.First == "" || m.Last == "" {
