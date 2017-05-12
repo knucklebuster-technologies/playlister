@@ -7,7 +7,7 @@ import (
 )
 
 func artist(dbname string, db *mgo.Session, router *mux.Router) {
-	c := controllers.NewArtistController(db.Copy().DB(dbname))
+	c := controllers.NewArtist(db.Copy().DB(dbname))
 	router.HandleFunc("/v1/Artist", c.Create).Methods("PODT")
 	router.HandleFunc("/v1/artist", c.Read).Methods("GET")
 	router.HandleFunc("/v1/artist", c.Update).Methods("PUT")

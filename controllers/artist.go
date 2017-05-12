@@ -11,19 +11,19 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// ArtistController manages the Artist endpoint
-type ArtistController struct {
+// Artist manages the Artist endpoint
+type Artist struct {
 	collection *mgo.Collection
 }
 
-// NewArtistController returns a controller that manages the Artists endpoint
-func NewArtistController(d *mgo.Database) *ArtistController {
+// NewArtist returns a controller that manages the Artists endpoint
+func NewArtist(d *mgo.Database) *Artist {
 	c := d.C("artists")
-	return &ArtistController{c}
+	return &Artist{c}
 }
 
 // Create adds a specific Artist in the collection
-func (c ArtistController) Create(w http.ResponseWriter, r *http.Request) {
+func (c Artist) Create(w http.ResponseWriter, r *http.Request) {
 	log.Println("PostArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
@@ -47,7 +47,7 @@ func (c ArtistController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 // Read returns a specific Artist in the collection
-func (c ArtistController) Read(w http.ResponseWriter, r *http.Request) {
+func (c Artist) Read(w http.ResponseWriter, r *http.Request) {
 	log.Println("GetArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
@@ -73,12 +73,12 @@ func (c ArtistController) Read(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update modifies a specific Artist in the collection
-func (c ArtistController) Update(w http.ResponseWriter, r *http.Request) {
+func (c Artist) Update(w http.ResponseWriter, r *http.Request) {
 	sendResponse("UPDATED", "Artist was updated", models.Artist{}, 200, w)
 }
 
 // Delete removes a specific Artist in the collection
-func (c ArtistController) Delete(w http.ResponseWriter, r *http.Request) {
+func (c Artist) Delete(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
