@@ -35,6 +35,9 @@ func (c *Config) Read(path string) error {
 	if err != nil {
 		return errors.Wrap(err, "Failed to read file @ "+path)
 	}
-	json.Unmarshal(file, c)
+	err = json.Unmarshal(file, c)
+	if err != nil {
+		return errors.Wrap(err, "Failed to Unmarshal Json")
+	}
 	return nil
 }
