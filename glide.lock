@@ -1,10 +1,12 @@
 hash: 334399770a00f3bdd675075af82ee8c53e3399be9c07c15eb8706fd55158f6d6
-updated: 2017-04-19T08:27:06.8664698-07:00
+updated: 2017-05-12T16:33:32.6032326-07:00
 imports:
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
   version: 392c28fe23e1c45ddba891b0320b3b5df220beea
+- name: github.com/pkg/errors
+  version: c605e284fe17294bda444b34710735b29d1a9d90
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
