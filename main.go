@@ -2,14 +2,12 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
-	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/qawarrior/playlister/config"
 	"github.com/qawarrior/playlister/database"
 	"github.com/qawarrior/playlister/routes"
+	"github.com/qawarrior/playlister/webserver"
 )
 
 func main() {
@@ -50,17 +48,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	startHTTPServer(config.Server.Address, router)
-}
-
-func startHTTPServer(address string, router *mux.Router) {
-	log.Println("SETTING UP HTTP SERVER")
-	srv := &http.Server{
-		Handler:      router,
-		Addr:         address,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-	log.Println("STARTING HTTP SERVER AT:", address)
-	log.Fatal(srv.ListenAndServe())
+	log.Println("Starting Webserver at " + config.Server.Address)
+	webserver.Start(config.Server.Address, router)
 }
