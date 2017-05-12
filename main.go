@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/qawarrior/playlister/config"
 	"github.com/qawarrior/playlister/database"
+	"github.com/qawarrior/playlister/routes"
 )
 
 func main() {
@@ -43,12 +44,11 @@ func main() {
 	}
 	defer dbsrv.Session.Close()
 
-	log.Println("SETTING UP HTTP ROUTER")
-	router := mux.NewRouter().StrictSlash(true)
-
-	userRoutes(config.Data, db, router)
-
-	artistRoutes(config.Data, db, router)
+	log.Println("SETTING UP ROUTING")
+	router, err := routes.Set(config.Data.DbName, dbsrv.Session)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	startHTTPServer(config.Server.Address, router)
 }
