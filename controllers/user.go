@@ -24,22 +24,16 @@ func NewUser(d *mgo.Database) *User {
 
 // Create creates a new user
 func (c User) Create(w http.ResponseWriter, r *http.Request) {
-	// Stub an user to be populated from the body
 	m := models.User{}
 
-	// Populate the user data
 	json.NewDecoder(r.Body).Decode(&m)
 
-	// Add an Id
 	m.ID = bson.NewObjectId()
 
-	// Write the user to mongo
 	c.collection.Insert(&m)
 
-	// Marshal provided interface into JSON structure
 	mj, _ := json.Marshal(m)
 
-	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
 	fmt.Fprintf(w, "%s", mj)
@@ -47,23 +41,19 @@ func (c User) Create(w http.ResponseWriter, r *http.Request) {
 
 // Read returns an existing user by email and password
 func (c User) Read(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	email := vars["email"]
-	password := vars["password"]
+	vals := r.URL.Query()
+	email := vals.Get("email")
+	password := vals.Get("password")
 
-	// Stub user
 	m := models.User{}
 
-	// Fetch user
 	if err := c.collection.Find(bson.M{"email": email, "password": password}).One(&m); err != nil {
 		w.WriteHeader(404)
 		return
 	}
 
-	// Marshal provided interface into JSON structure
 	mj, _ := json.Marshal(m)
 
-	// Write content-type, statuscode, payload
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	fmt.Fprintf(w, "%s", mj)

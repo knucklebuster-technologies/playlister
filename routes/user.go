@@ -7,7 +7,7 @@ import (
 )
 
 func user(dbname string, db *mgo.Session, router *mux.Router) {
-	c := controllers.NewUserController(db.Copy().DB(dbname))
+	c := controllers.NewUser(db.Copy().DB(dbname))
 	router.HandleFunc("/v1/user", c.Create).Methods("POST")
 	router.HandleFunc("/v1/user", c.Read).Methods("GET")
 	router.HandleFunc("/v1/user", c.Update).Methods("PUT")
