@@ -16,13 +16,13 @@ type User struct {
 	collection *mgo.Collection
 }
 
-// NewUser returns a controller for a User
+// NewUser returns a controller for the User endpoint
 func NewUser(d *mgo.Database) *User {
 	c := d.C("users")
 	return &User{c}
 }
 
-// Create creates a new user
+// Create adds a new user
 func (c User) Create(w http.ResponseWriter, r *http.Request) {
 	m := models.User{}
 
@@ -59,12 +59,12 @@ func (c User) Read(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", mj)
 }
 
-// Update modifies an existing user in the database
+// Update modifies an existing user
 func (c User) Update(w http.ResponseWriter, r *http.Request) {
 	sendResponse("Success", "User Updated", nil, 200, w)
 }
 
-// Delete removes a existing user
+// Delete removes an existing user
 func (c User) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	email := vars["email"]
