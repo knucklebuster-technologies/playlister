@@ -12,6 +12,7 @@ type Server struct {
 
 // Start invokes the mongod server daemon to make it available
 func (srv *Server) Start() error {
+	ensureDBPath(srv.path)
 	srv.cmd = exec.Command("mongod", "--dbpath", srv.path)
 	err := srv.cmd.Start()
 	if err != nil {
