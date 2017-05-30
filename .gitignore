@@ -58,3 +58,6 @@ _testmain.go
 # =========================
 
 db/
+
+# JSON Sample Files
+JSON/
