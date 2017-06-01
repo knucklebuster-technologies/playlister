@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"io"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -18,7 +19,12 @@ type Artist struct {
 	Bio        string        `json:"bio" bson:"bio"`
 }
 
-// MarshalJSON implement to Marshaler interface
-func (a *Artist) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a)
+// Encode writes the structs value to a stream
+func (a *Artist) Encode(w io.Writer) error {
+	return json.NewEncoder(w).Encode(a)
+}
+
+// Decode reads a stream and assigns values to the structs properties
+func (a *Artist) Decode(r io.Reader) error {
+	return json.NewDecoder(r).Decode(a)
 }

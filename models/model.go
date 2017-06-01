@@ -1,7 +1,9 @@
 package models
 
-// Modeler interface for models to marshal and unmarshal JSON
+import "io"
+
+// Modeler interface for models to marshal and decode JSON
 type Modeler interface {
-	MarshalJSON() ([]byte, error)
-	UnmarshalJSON([]byte) error
+	Encode(io.Writer) error
+	Decode(io.Reader) error
 }
