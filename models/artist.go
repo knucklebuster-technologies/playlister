@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -15,4 +16,9 @@ type Artist struct {
 	Died       time.Time     `json:"died" bson:"died"`
 	Birthplace string        `json:"birthplace" bson:"birthplace"`
 	Bio        string        `json:"bio" bson:"bio"`
+}
+
+// MarshalJSON implement to Marshaler interface
+func (a *Artist) MarshalJSON() ([]byte, error) {
+	return json.Marshal(a)
 }
