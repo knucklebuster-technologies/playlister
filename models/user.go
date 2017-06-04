@@ -17,12 +17,12 @@ type User struct {
 	Age      int           `json:"age" bson:"age"`
 }
 
-// MarshalJSON returns the struct marshalled to json
-func (u *User) MarshalJSON() ([]byte, error) {
-	return json.Marshal(u)
+// Encode writes the structs value to a stream
+func (a *User) Encode(w io.Writer) error {
+	return json.NewEncoder(w).Encode(a)
 }
 
-// Decode takes a stream and uses its data to assign values to the properties
-func (u *User) Decode(r io.Reader) error {
-	return json.NewDecoder(r).Decode(u)
+// Decode reads a stream and assigns values to the structs properties
+func (a *User) Decode(r io.Reader) error {
+	return json.NewDecoder(r).Decode(a)
 }

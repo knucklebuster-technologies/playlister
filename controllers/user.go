@@ -25,18 +25,14 @@ func NewUser(d *mgo.Database) *User {
 // Create adds a new user
 func (c User) Create(w http.ResponseWriter, r *http.Request) {
 	m := models.User{}
-
-	json.NewDecoder(r.Body).Decode(&m)
-
+	m.Decode(r.Body)
 	m.ID = bson.NewObjectId()
 
 	c.collection.Insert(&m)
 
-	mj, _ := json.Marshal(m)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
-	fmt.Fprintf(w, "%s", mj)
+	m.Encode(w)
 }
 
 // Read returns an existing user by email and password
@@ -52,11 +48,9 @@ func (c User) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mj, _ := json.Marshal(m)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
-	fmt.Fprintf(w, "%s", mj)
+	m.Encode(w)
 }
 
 // Update modifies an existing user
