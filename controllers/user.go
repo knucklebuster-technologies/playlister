@@ -17,9 +17,20 @@ type User struct {
 }
 
 // NewUser returns a controller for the User endpoint
-func NewUser(d *mgo.Database) *User {
+func NewUser(d *mgo.Database) (*User, error) {
+	index := mgo.Index{
+		Key:        []string{"name", "email"},
+		Unique:     true,
+		DropDups:   true,
+		Background: true,
+		Sparse:     true,
+	}
 	c := d.C("users")
-	return &User{c}
+	err := c.EnsureIndex(index)
+	if err != nil {
+		return nil, err
+	}
+	return &User{c}, nil
 }
 
 // Create adds a new user
@@ -55,6 +66,11 @@ func (c User) Read(w http.ResponseWriter, r *http.Request) {
 
 // Update modifies an existing user
 func (c User) Update(w http.ResponseWriter, r *http.Request) {
+	vals := r.URL.Query()
+	email := vals.Get("email")
+	password := vals.Get("password")
+
+	querier := bson.M
 	sendResponse("Success", "User Updated", nil, 200, w)
 }
 
