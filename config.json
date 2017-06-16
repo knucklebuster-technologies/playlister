@@ -1,4 +1,5 @@
 {
+    "projectEnv": "development",
     "appName": "playlister",
     "appURI": "https://github.com/qawarrior/playlister",
     "version": "v0.0.1-alpha",

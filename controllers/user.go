@@ -66,11 +66,10 @@ func (c User) Read(w http.ResponseWriter, r *http.Request) {
 
 // Update modifies an existing user
 func (c User) Update(w http.ResponseWriter, r *http.Request) {
-	vals := r.URL.Query()
-	email := vals.Get("email")
-	password := vals.Get("password")
+	//vals := r.URL.Query()
+	//email := vals.Get("email")
+	//password := vals.Get("password")
 
-	querier := bson.M
 	sendResponse("Success", "User Updated", nil, 200, w)
 }
 

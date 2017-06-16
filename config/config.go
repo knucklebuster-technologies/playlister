@@ -9,10 +9,11 @@ import (
 
 // Config type to hold the values in the config.json
 type Config struct {
-	AppName string `json:"appName"`
-	AppURI  string `json:"appURI"`
-	Version string `json:"version"`
-	Server  struct {
+	ProjectEnv string `json:"projectEnv"`
+	AppName    string `json:"appName"`
+	AppURI     string `json:"appURI"`
+	Version    string `json:"version"`
+	Server     struct {
 		Address string `json:"address"`
 	} `json:"server"`
 	Data struct {
