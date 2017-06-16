@@ -49,7 +49,7 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	logger.Info.Println("Starting Webserver at " + config.Server.Address)
+	logger.Info.Println("STARTING SERVER @ " + config.Server.Address)
 	webserver.Start(config.Server.Address, router)
 	defer webserver.Stop()
 }
