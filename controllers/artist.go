@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/qawarrior/playlister/loggy"
 	"github.com/qawarrior/playlister/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -24,6 +25,7 @@ func NewArtist(d *mgo.Database) *Artist {
 
 // Create adds a specific Artist in the collection
 func (c Artist) Create(w http.ResponseWriter, r *http.Request) {
+	loggy.Info.Println("ARTIST CONTROLLLER CREATE METHOD CALLED")
 	m := decodeArtist(r.Body, models.Artist{})
 
 	if m.First == "" || m.Last == "" {
@@ -47,6 +49,7 @@ func (c Artist) Create(w http.ResponseWriter, r *http.Request) {
 
 // Read returns a specific Artist in the collection
 func (c Artist) Read(w http.ResponseWriter, r *http.Request) {
+	loggy.Info.Println("ARTIST CONTROLLLER READ METHOD CALLED")
 	log.Println("GetArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 
@@ -73,11 +76,13 @@ func (c Artist) Read(w http.ResponseWriter, r *http.Request) {
 
 // Update modifies a specific Artist in the collection
 func (c Artist) Update(w http.ResponseWriter, r *http.Request) {
+	loggy.Info.Println("ARTIST CONTROLLLER UPDATE METHOD CALLED")
 	sendResponse("UPDATED", "Artist was updated", models.Artist{}, 200, w)
 }
 
 // Delete removes a specific Artist in the collection
 func (c Artist) Delete(w http.ResponseWriter, r *http.Request) {
+	loggy.Info.Println("ARTIST CONTROLLLER DELETE METHOD CALLED")
 	log.Println("DeleteArtist called")
 	m := decodeArtist(r.Body, models.Artist{})
 

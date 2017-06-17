@@ -1,29 +1,21 @@
 package loggy
 
 import (
-	"io"
 	"log"
 	"os"
 )
 
-// Logger simple struct to log events
-type Logger struct {
-	Info  *log.Logger
-	Warn  *log.Logger
-	Error *log.Logger
-}
+// Info logs information events
+var Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 
-// New sets up a Logger for use through out application
-func New(infoHandle io.Writer, warnHandle io.Writer, errorHandle io.Writer) *Logger {
-	return &Logger{
-		log.New(infoHandle, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile),
-		log.New(warnHandle, "WARN: ", log.Ldate|log.Ltime|log.Lshortfile),
-		log.New(errorHandle, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile),
-	}
-}
+// Warn logs warning events
+var Warn = log.New(os.Stdout, "WARN: ", log.Ldate|log.Ltime|log.Lshortfile)
 
-// Fatal calls Error.Println followed by os.Exit(1)
-func (l *Logger) Fatal(i interface{}) {
-	l.Error.Print(i)
+// Error logs error events
+var Error = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+
+// Fatal same as Error call followed by os.Exit(1)
+func Fatal(i interface{}) {
+	Error.Print(i)
 	os.Exit(1)
 }

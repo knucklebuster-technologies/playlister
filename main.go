@@ -11,45 +11,44 @@ import (
 )
 
 func main() {
-	logger := *loggy.New(os.Stdout, os.Stdout, os.Stderr)
-	logger.Info.Println("STARTING MAIN")
+	loggy.Info.Println("STARTING MAIN")
 
-	logger.Info.Println("GETTING WORKING DIRECTORY")
+	loggy.Info.Println("GETTING WORKING DIRECTORY")
 	wdir, err := os.Getwd()
 	if err != nil {
-		logger.Fatal(err)
+		loggy.Fatal(err)
 	}
-	logger.Info.Println("WORKING DIRECTORY:", wdir)
+	loggy.Info.Println("WORKING DIRECTORY:", wdir)
 
-	logger.Info.Println("READING CONFIGURATION")
+	loggy.Info.Println("READING CONFIGURATION")
 	config := config.Config{}
 	err = config.Read(wdir + `\config.json`)
 	if err != nil {
-		logger.Fatal(err)
+		loggy.Fatal(err)
 	}
 
-	logger.Info.Println("STARTING DATABASE SERVER")
+	loggy.Info.Println("STARTING DATABASE SERVER")
 	dbsrv := database.NewServer(wdir + `\db`)
 	err = dbsrv.Start()
 	if err != nil {
-		logger.Fatal(err)
+		loggy.Fatal(err)
 	}
 	defer dbsrv.Stop()
 
-	logger.Info.Println("CREATING DATABASE SESSION")
+	loggy.Info.Println("CREATING DATABASE SESSION")
 	err = dbsrv.Connect(config.Data.URI)
 	if err != nil {
-		logger.Fatal(err)
+		loggy.Fatal(err)
 	}
 	defer dbsrv.Session.Close()
 
-	logger.Info.Println("SETTING UP ROUTING")
+	loggy.Info.Println("SETTING UP ROUTING")
 	router, err := routes.Set(config.Data.DbName, dbsrv.Session)
 	if err != nil {
-		logger.Fatal(err)
+		loggy.Fatal(err)
 	}
 
-	logger.Info.Println("STARTING SERVER @ " + config.Server.Address)
+	loggy.Info.Println("STARTING SERVER @ " + config.Server.Address)
 	webserver.Start(config.Server.Address, router)
 	defer webserver.Stop()
 }
